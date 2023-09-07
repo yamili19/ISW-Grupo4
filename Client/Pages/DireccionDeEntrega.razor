@@ -1,0 +1,318 @@
+﻿@page "/direccion-entrega"
+@inject NavigationManager NavigationManager
+
+<h3>Ingrese su Dirección de Entrega</h3>
+
+<div>
+    <label for="calle">Calle:</label>
+    <input type="text" class="form-control" id="calle" @bind="Calle" />
+</div>
+
+<div>
+    <label for="altura">Altura:</label>
+    <input type="number" class="form-control" id="altura" @bind="Altura" />
+</div>
+
+<div>
+    <label for="ciudad">Ciudad:</label>
+    <select class="form-control" id="ciudad" @bind="Ciudad">
+        <option value="Alta Gracia">Alta Gracia</option>
+        <option value="Córdoba">Córdoba</option>
+        <option value="Cruz del Eje">Cruz del Eje</option>
+        <option value="Rio Cuarto">Rio Cuarto</option>
+    </select>
+</div>
+
+<div>
+    <label for="referencia">Referencia (opcional):</label>
+    <input type="text" class="form-control" id="referencia" @bind="Referencia" />
+</div>
+
+<!-- Sección de Productos y Monto Acumulado -->
+<h3>Selección de Productos</h3>
+<ul>
+    @foreach (var producto in productos)
+    {
+        <li>
+            @producto.Nombre - Precio: $@producto.Precio
+            <button @onclick="() => AgregarAlCarrito(producto)">Agregar al Carrito</button>
+        </li>
+    }
+</ul>
+
+<p>Cantidad de Productos en el Carrito: @cantidadProductos</p>
+<p>Monto Acumulado: $@montoAcumulado</p>
+
+<h3>Seleccionar Forma de Pago</h3>
+
+<div>
+    <label>Forma de Pago:</label>
+    <select @bind="formaDePago">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Debito">Tarjeta de Débito</option>
+        <option value="Credito">Tarjeta de Crédito</option>
+    </select>
+</div>
+
+@if (formaDePago == "Credito" || formaDePago == "Debito")
+{
+    <div>
+        <label>Número de Tarjeta:</label>
+        <input type="text" @bind="numeroTarjeta" placeholder="____ ____ ____ ____" @oninput="FormatoNumeroTarj" />
+        @if (mensajeTarjeta != "")
+        {
+            <p class="text-danger">@mensajeTarjeta</p>
+        }
+    </div>
+
+    <div>
+        <label>Nombre y apellido del titular:</label>
+        <input type="text" @bind="nombreApellido" />
+    </div>
+
+    <div>
+        <label>Fecha de Vencimiento (mm/aaaa):</label>
+        <select @bind="fechaVencimiento">
+            @foreach (var fecha in fechasVencimientoPosteriores)
+            {
+                <option value="@fecha">@fecha.ToString("MM/yyyy")</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <label>CVC:</label>
+        <input type="number" @bind="CVC" placeholder="___" @oninput="validarCVC" />
+        @if (mensajeCVC != "")
+        {
+            <p class="text-danger">@mensajeCVC</p>
+        }
+    </div>
+
+}
+@if (formaDePago == "Efectivo")
+{
+    <div>
+        <label>Monto con el que va a pagar:</label>
+        <input type="number" @bind="montoPagar" />
+    </div>
+}
+
+<h3>Seleccionar Forma de Entrega</h3>
+<div>
+    <label>Forma de Entrega:</label>
+    <select @bind="formaDeEntrega">
+        <option value="antesPosible">Lo antes posible</option>
+        <option value="fechaHoraEspecifica">Fecha y hora específica</option>
+    </select>
+</div>
+
+@if (formaDeEntrega == "fechaHoraEspecifica")
+{
+    <div>
+        <label>Fecha de entrega:</label>
+        <select @bind="fechaEntrega">
+            @foreach (var fecha in fechasEntregaPosteriores)
+            {
+                <option value="@fecha">@fecha.ToShortDateString()</option>
+            }
+        </select>
+
+        <label>Hora de entrega:</label>
+        <select @bind="horaSeleccionada">
+            @foreach (var hora in horasPosteriores)
+            {
+                <option value="@hora">@hora</option>
+            }
+        </select>
+    </div>
+}
+
+
+<button class="btn btn-primary" @onclick="Continuar">Completar Compra</button>
+
+
+
+
+@code {
+
+    private DateTime fechaVencimiento { get; set; }
+    private List<DateTime> fechasVencimientoPosteriores { get; set; }
+
+    private DateTime fechaEntrega { get; set; }
+    private List<DateTime> fechasEntregaPosteriores { get; set; }
+
+    private void CargarFechasPosterioresVencimiento()
+    {
+        // Obtiene el mes y año actual
+        DateTime fechaActual = DateTime.Now.Date; // Solo la fecha, sin la hora
+        int mesActual = fechaActual.Month;
+        int anioActual = fechaActual.Year;
+
+        // Inicializa la lista de fechas
+        fechasVencimientoPosteriores = new List<DateTime>();
+        // Agrega las fechas iguales o posteriores al mes y año actual a la lista
+        for (int anio = anioActual; anio <= anioActual + 7; anio++) // Puedes ajustar el rango de años según tus necesidades
+        {
+            for (int mes = mesActual; mes <= 12; mes++) // 12 meses en un año
+            {
+                DateTime fecha = new DateTime(anio, mes, 1);
+                fechasVencimientoPosteriores.Add(fecha);
+            }
+            mesActual = 1; // Reiniciar el mes después del primer año
+        }
+
+        // Selecciona el mes y año actual como valor predeterminado
+        fechaVencimiento = new DateTime(anioActual, mesActual, 1);
+    }
+
+    private void CargarFechasPosterioresEntrega()
+    {
+        // Obtiene la fecha actual
+        DateTime fechaActual = DateTime.Now.Date; // Solo la fecha, sin la hora
+
+        // Inicializa la lista de fechas
+        fechasEntregaPosteriores = new List<DateTime>();
+
+        // Agrega las fechas iguales o posteriores a la fecha actual a la lista
+        for (int i = 0; i <= 7; i++) // Por ejemplo, puedes cargar las próximas 7 fechas
+        {
+            DateTime fecha = fechaActual.AddDays(i);
+            fechasEntregaPosteriores.Add(fecha);
+        }
+
+        // Selecciona la fecha actual como valor predeterminado
+        fechaEntrega = fechaActual;
+    }
+
+    private string horaSeleccionada { get; set; }
+    private List<string> horasPosteriores { get; set; }
+
+    protected override void OnInitialized()
+    {
+        CargarHorasPosteriores();
+        CargarFechasPosterioresEntrega();
+        CargarFechasPosterioresVencimiento();
+    }
+
+    private void CargarHorasPosteriores()
+    {
+        // Obtiene la hora actual
+        DateTime horaActual = DateTime.Now;
+
+        // Inicializa la lista de horas
+        horasPosteriores = new List<string>();
+
+        // Agrega las horas posteriores a la hora actual a la lista
+        for (int i = horaActual.Hour; i <= 23; i++)
+        {
+            horasPosteriores.Add(i.ToString("00") + ":00");
+        }
+
+        // Selecciona la hora actual como valor predeterminado
+        horaSeleccionada = horasPosteriores.FirstOrDefault();
+    }
+    private string mensajeCVC = "";
+    private string formaDePago = "Efectivo";
+    private string numeroTarjeta = "";
+    private string nombreApellido = "";
+    private string CVC = "";
+    private int montoPagar = 0;
+    private string formaDeEntrega = "antesPosible";
+
+    private bool transaccionExitosa = false;
+    private bool camposLlenosDireccion = false;
+    private bool montoCorrecto = false;
+    private string Calle = "";
+    private string Altura = "";
+    private string Ciudad = "";
+    private string Referencia = "";
+
+
+
+    private void validarCVC(ChangeEventArgs e)
+    {
+        if (e.Value.ToString().Length != 3)
+        {
+            CVC = "";
+            mensajeCVC = "Ingrese un CVC válido";
+        }
+        else
+        {
+            CVC = e.Value.ToString();
+            mensajeCVC = "";
+        }
+    }
+
+    private string mensajeTarjeta = "";
+    // Función para dar formato al número de tarjeta (16 dígitos en 4 grupos de cuatro)
+    private void FormatoNumeroTarj(ChangeEventArgs e)
+    {
+        numeroTarjeta = FormatoNumeroTarjeta(e.Value.ToString());
+        if (numeroTarjeta.Length > 19 || numeroTarjeta.Length < 19)
+        {
+            numeroTarjeta = "";
+            mensajeTarjeta = "Tarjeta inválida. Ingrese una tarjeta válida";
+        }
+        else
+        {
+            numeroTarjeta = FormatoNumeroTarjeta(e.Value.ToString());
+            mensajeTarjeta = "";
+        }
+    }
+
+
+
+    private string FormatoNumeroTarjeta(string numero)
+    {
+        // Eliminar caracteres no numéricos
+        numero = new string(numero.Where(char.IsDigit).ToArray());
+
+        // Aplicar formato de 16 dígitos en 4 grupos de cuatro
+        if (numero.Length >= 4)
+        {
+            numero = numero.Insert(4, " ");
+        }
+        if (numero.Length >= 9)
+        {
+            numero = numero.Insert(9, " ");
+        }
+        if (numero.Length >= 14)
+        {
+            numero = numero.Insert(14, " ");
+        }
+
+        numeroTarjeta = numero; // Actualiza la propiedad vinculada
+        return numero;
+    }
+
+    private void Continuar()
+    {
+        //falta verificar que los campos de direccion no se encuentren vacios, que el monto con el que se va a pagar sea mayor o igual
+        // al monto del carrito, falta ver si la tarjeta de credito o debito es visa (las visa empiezan con 4) y faltaria ver el tema de lo visual
+    }
+
+    
+    private List<Producto> productos = new List<Producto>
+    {
+        new Producto { Nombre = "Producto 1", Precio = 10.99m },
+        new Producto { Nombre = "Producto 2", Precio = 15.99m },
+        new Producto { Nombre = "Producto 3", Precio = 12.49m }
+    };
+
+    private int cantidadProductos = 0;
+    private decimal montoAcumulado = 0.0m;
+
+    private class Producto
+    {
+        public string Nombre { get; set; }
+        public decimal Precio { get; set; }
+    }
+
+    private void AgregarAlCarrito(Producto producto)
+    {
+        montoAcumulado += producto.Precio;
+        cantidadProductos++; // Incrementar la cantidad de productos en el carrito.
+    }
+
+}
