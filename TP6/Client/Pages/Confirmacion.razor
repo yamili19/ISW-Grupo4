@@ -1,42 +1,15 @@
 ﻿@page "/confirmacion"
 @inject NavigationManager NavigationManager
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Animación de carga</title>
-</head>
-<body>
-    <div class="loading">
-        <img src="loading.gif" alt="Animación de carga">
-    </div>
+<h3>¡Gracias por su compra!</h3>
 
-    <script>
+<img src="loading.gif" alt="Imagen de exito">
 
-        // Esta función se ejecuta cuando la página se carga
-        window.onload = function() {
-            // Muestra la animación de carga
-            document.querySelector(".loading").classList.add("active");
+<button class="btn btn-primary" @onclick="Volver">Volver</button>
 
-            // Simula la carga de la transacción
-            var animation = function() {
-                // Actualiza la animación
-                // ...
-
-                // Solicita el siguiente fotograma
-                requestAnimationFrame(animation);
-            };
-
-            // Inicia la animación
-            animation();
-
-            await Task.Delay(TimeSpan.FromSeconds(6));
-
-            NavigationManager.NavigateTo("/direccion-entrega");
-
-        };
-    </script>
-</body>
-</html>
+@code {
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/direccion-entrega");
+    }
+}
