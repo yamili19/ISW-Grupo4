@@ -119,7 +119,7 @@
         </select>
 
         <label>Hora de entrega:</label>
-        <select @bind="horaSeleccionada">
+        <select @bind="horaEntrega">
             @foreach (var hora in horasPosteriores)
             {
                 <option value="@hora">@hora</option>
@@ -185,7 +185,7 @@
         fechaEntrega = fechaActual;
     }
 
-    private string horaSeleccionada { get; set; }
+    private string horaEntrega { get; set; }
     private List<string> horasPosteriores { get; set; }
 
     protected override void OnInitialized()
@@ -210,7 +210,7 @@
         }
 
         // Selecciona la hora actual como valor predeterminado
-        horaSeleccionada = horasPosteriores.FirstOrDefault();
+        horaEntrega = horasPosteriores.FirstOrDefault();
     }
     private string mensajeCVC = "";
     private string formaDePago = "Efectivo";
@@ -222,10 +222,9 @@
 
     private bool transaccionExitosa = false;
     private bool camposLlenosDireccion = false;
-    private bool montoCorrecto = false;
     private string Calle = "";
     private string Altura = "";
-    private string Ciudad = "";
+    private string Ciudad = "Alta Gracia";
     private string Referencia = "";
 
 
@@ -288,8 +287,51 @@
 
     private void Continuar()
     {
-        //falta verificar que los campos de direccion no se encuentren vacios, que el monto con el que se va a pagar sea mayor o igual
-        // al monto del carrito, falta ver si la tarjeta de credito o debito es visa (las visa empiezan con 4) y faltaria ver el tema de lo visual
+        if (!String.IsNullOrEmpty(Calle) || !String.IsNullOrEmpty(Altura))
+        {
+            if (formaDePago == "Efectivo")
+            {
+                if (montoPagar >= montoAcumulado)
+                {
+                    if (cantidadProductos > 0)
+                    {
+                        transaccionExitosa = true;
+                        NavigationManager.NavigateTo("/confirmacion");
+                    }
+                    else
+                    {
+                        transaccionExitosa = false;
+                    }
+                }
+                else
+                {
+                    transaccionExitosa = false;
+                }
+            }
+            else
+            {
+                if (mensajeTarjeta == "" && mensajeCVC == "" && CVC != "" && numeroTarjeta != "")
+                {
+                    if (cantidadProductos > 0)
+                    {
+                        transaccionExitosa = true;
+                        NavigationManager.NavigateTo("/confirmacion");
+                    }
+                    else
+                    {
+                        transaccionExitosa = false;
+                    }
+                }
+                else
+                {
+                    transaccionExitosa = false;
+                }
+            }
+        }
+        else
+        {
+            transaccionExitosa = false;
+        }
     }
 
     
