@@ -6,11 +6,19 @@
 <div>
     <label for="calle">Calle:</label>
     <input type="text" class="form-control" id="calle" @bind="Calle" />
+    @if (mensajeCalle != "")
+    {
+        <p class="text-danger">@mensajeCalle</p>
+    }
 </div>
 
 <div>
     <label for="altura">Altura:</label>
     <input type="number" class="form-control" id="altura" @bind="Altura" />
+    @if (mensajeAltura != "")
+    {
+        <p class="text-danger">@mensajeAltura</p>
+    }
 </div>
 
 <div>
@@ -36,6 +44,10 @@
         <li>
             @producto.Nombre - Precio: $@producto.Precio
             <button @onclick="() => AgregarAlCarrito(producto)">Agregar al Carrito</button>
+            @if (mensajeCarrito != "")
+            {
+                <p class="text-danger">@mensajeCarrito</p>
+            }
         </li>
     }
 </ul>
@@ -95,6 +107,10 @@
     <div>
         <label>Monto con el que va a pagar:</label>
         <input type="number" @bind="montoPagar" />
+        @if (mensajeMonto != "")
+        {
+            <p class="text-danger">@mensajeMonto</p>
+        }
     </div>
 }
 
@@ -138,9 +154,27 @@
 
     private DateTime fechaVencimiento { get; set; }
     private List<DateTime> fechasVencimientoPosteriores { get; set; }
-
     private DateTime fechaEntrega { get; set; }
     private List<DateTime> fechasEntregaPosteriores { get; set; }
+    private string mensajeCVC = "";
+    private string formaDePago = "Efectivo";
+    private string numeroTarjeta = "";
+    private string nombreApellido = "";
+    private string CVC = "";
+    private int montoPagar = 0;
+    private string formaDeEntrega = "antesPosible";
+    private bool camposLlenosDireccion = false;
+    private string Calle = "";
+    private string Altura = "";
+    private string Ciudad = "Alta Gracia";
+    private string Referencia = "";
+    private string horaEntrega { get; set; }
+    private List<string> horasPosteriores { get; set; }
+    private string mensajeTarjeta = "";
+    private string mensajeCarrito = "";
+    private string mensajeMonto = "";
+    private string mensajeCalle = "";
+    private string mensajeAltura = "";
 
     private void CargarFechasPosterioresVencimiento()
     {
@@ -185,9 +219,6 @@
         fechaEntrega = fechaActual;
     }
 
-    private string horaEntrega { get; set; }
-    private List<string> horasPosteriores { get; set; }
-
     protected override void OnInitialized()
     {
         CargarHorasPosteriores();
@@ -212,22 +243,6 @@
         // Selecciona la hora actual como valor predeterminado
         horaEntrega = horasPosteriores.FirstOrDefault();
     }
-    private string mensajeCVC = "";
-    private string formaDePago = "Efectivo";
-    private string numeroTarjeta = "";
-    private string nombreApellido = "";
-    private string CVC = "";
-    private int montoPagar = 0;
-    private string formaDeEntrega = "antesPosible";
-
-    private bool transaccionExitosa = false;
-    private bool camposLlenosDireccion = false;
-    private string Calle = "";
-    private string Altura = "";
-    private string Ciudad = "Alta Gracia";
-    private string Referencia = "";
-
-
 
     private void validarCVC(ChangeEventArgs e)
     {
@@ -242,8 +257,6 @@
             mensajeCVC = "";
         }
     }
-
-    private string mensajeTarjeta = "";
     // Función para dar formato al número de tarjeta (16 dígitos en 4 grupos de cuatro)
     private void FormatoNumeroTarj(ChangeEventArgs e)
     {
@@ -259,8 +272,6 @@
             mensajeTarjeta = "";
         }
     }
-
-
 
     private string FormatoNumeroTarjeta(string numero)
     {
@@ -289,23 +300,26 @@
     {
         if (!String.IsNullOrEmpty(Calle) || !String.IsNullOrEmpty(Altura))
         {
+            mensajeCalle = "";
+            mensajeAltura = "";
             if (formaDePago == "Efectivo")
             {
                 if (montoPagar >= montoAcumulado)
                 {
+                    mensajeMonto = "";
                     if (cantidadProductos > 0)
                     {
-                        transaccionExitosa = true;
+                        mensajeCarrito = "";
                         NavigationManager.NavigateTo("/cargando");
                     }
                     else
                     {
-                        transaccionExitosa = false;
+                        mensajeCarrito = "Agregue productos al carrito";
                     }
                 }
                 else
                 {
-                    transaccionExitosa = false;
+                    mensajeMonto = "El monto con el que va a pagar no puede ser menor que el monto del carrito";
                 }
             }
             else
@@ -314,23 +328,31 @@
                 {
                     if (cantidadProductos > 0)
                     {
-                        transaccionExitosa = true;
+                        mensajeCarrito = "";
                         NavigationManager.NavigateTo("/cargando");
                     }
                     else
                     {
-                        transaccionExitosa = false;
+                        mensajeCarrito = "Agregue productos al carrito";
                     }
                 }
                 else
                 {
-                    transaccionExitosa = false;
+                    if (CVC == "")
+                    {
+                        mensajeCVC = "Ingrese un código de seguridad";
+                    }
+                    if (numeroTarjeta == "")
+                    {
+                        mensajeTarjeta = "Ingrese un nro de tarjeta";
+                    }
                 }
             }
         }
         else
         {
-            transaccionExitosa = false;
+            mensajeCalle = "Ingrese una calle";
+            mensajeAltura = "Ingrese una altura";
         }
     }
 
