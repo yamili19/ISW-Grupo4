@@ -44,11 +44,11 @@
         <li>
             @producto.Nombre - Precio: $@producto.Precio
             <button @onclick="() => AgregarAlCarrito(producto)">Agregar al Carrito</button>
-            @if (mensajeCarrito != "")
-            {
-                <p class="text-danger">@mensajeCarrito</p>
-            }
         </li>
+    }
+    @if (mensajeCarrito != "")
+    {
+        <p class="text-danger">@mensajeCarrito</p>
     }
 </ul>
 
@@ -80,6 +80,10 @@
     <div>
         <label>Nombre y apellido del titular:</label>
         <input type="text" @bind="nombreApellido" />
+        @if (mensajeTitular != "")
+        {
+            <p class="text-danger">@mensajeTitular</p>
+        }
     </div>
 
     <div>
@@ -175,6 +179,7 @@
     private string mensajeMonto = "";
     private string mensajeCalle = "";
     private string mensajeAltura = "";
+    private string mensajeTitular = "";
 
     private void CargarFechasPosterioresVencimiento()
     {
@@ -324,7 +329,7 @@
             }
             else
             {
-                if (mensajeTarjeta == "" && mensajeCVC == "" && CVC != "" && numeroTarjeta != "")
+                if (mensajeTarjeta == "" && mensajeCVC == "" && CVC != "" && numeroTarjeta != "" && nombreApellido != "")
                 {
                     if (cantidadProductos > 0)
                     {
@@ -345,6 +350,10 @@
                     if (numeroTarjeta == "")
                     {
                         mensajeTarjeta = "Ingrese un nro de tarjeta";
+                    }
+                    if (nombreApellido == "")
+                    {
+                        mensajeTitular = "Ingrese nombre y apellido del titular de la tarjeta";
                     }
                 }
             }
