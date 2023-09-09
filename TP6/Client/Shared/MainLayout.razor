@@ -1,4 +1,12 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager NavigationManager
+@code {
+    protected override void OnInitialized()
+    {
+        // Redirigir a la página "direccion-entrega" al cargar la aplicación
+        NavigationManager.NavigateTo("/direccion-entrega");
+    }
+}
 
 <div class="page">
     <div class="sidebar">
