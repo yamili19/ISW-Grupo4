@@ -1,28 +1,30 @@
 ﻿@page "/direccion-entrega"
 @inject NavigationManager NavigationManager
 
-<h3>Ingrese su Dirección de Entrega</h3>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<h3><strong>Ingrese su Dirección de Entrega</strong></h3>
 
 <div>
-    <label for="calle">Calle:</label>
+    <p><strong><label for="calle">Calle:</label></strong></p>
     <input type="text" class="form-control" id="calle" @bind="Calle" />
     @if (mensajeCalle != "")
     {
-        <p class="text-danger">@mensajeCalle</p>
+        <p class="text-danger"><strong>@mensajeCalle</strong></p>
     }
 </div>
 
 <div>
-    <label for="altura">Altura:</label>
+    <p><strong><label for="altura">Altura:</label></strong></p>
     <input type="number" class="form-control" id="altura" @bind="Altura" />
     @if (mensajeAltura != "")
     {
-        <p class="text-danger">@mensajeAltura</p>
+        <p class="text-danger"><strong>@mensajeAltura</strong></p>
     }
 </div>
 
 <div>
-    <label for="ciudad">Ciudad:</label>
+    <p><strong><label for="ciudad">Ciudad:</label></strong></p>
     <select class="form-control" id="ciudad" @bind="Ciudad">
         <option value="Alta Gracia">Alta Gracia</option>
         <option value="Córdoba">Córdoba</option>
@@ -32,33 +34,35 @@
 </div>
 
 <div>
-    <label for="referencia">Referencia (opcional):</label>
+    <p><strong><label for="referencia">Referencia (opcional):</label></strong></p>
     <input type="text" class="form-control" id="referencia" @bind="Referencia" />
 </div>
 
 <!-- Sección de Productos y Monto Acumulado -->
-<h3>Selección de Productos</h3>
+<h3> <strong>Selección de Productos</strong></h3>
 <ul>
     @foreach (var producto in productos)
     {
         <li>
-            @producto.Nombre - Precio: $@producto.Precio
-            <button @onclick="() => AgregarAlCarrito(producto)">Agregar al Carrito</button>
+            <p><strong>@producto.Nombre - Precio: $@producto.Precio</strong>.</p>
+            <button class="btn btn-outline-primary" @onclick="() => AgregarAlCarrito(producto)">
+                <i class="fas fa-cart-plus"></i> Agregar al Carrito
+            </button>
         </li>
     }
     @if (mensajeCarrito != "")
     {
-        <p class="text-danger">@mensajeCarrito</p>
+        <p class="text-danger"><strong>@mensajeCarrito</strong></p>
     }
 </ul>
 
-<p>Cantidad de Productos en el Carrito: @cantidadProductos</p>
-<p>Monto Acumulado: $@montoAcumulado</p>
+<p><strong>Cantidad de Productos en el Carrito: @cantidadProductos</strong></p>
+<p><strong>Monto Acumulado: $@montoAcumulado</strong></p>
 
-<h3>Seleccionar Forma de Pago</h3>
+<h3><strong>Seleccionar Forma de Pago</strong></h3>
 
 <div>
-    <label>Forma de Pago:</label>
+    <p><strong><label>Forma de Pago:</label></strong></p>
     <select @bind="formaDePago">
         <option value="Efectivo">Efectivo</option>
         <option value="Debito">Tarjeta de Débito</option>
@@ -69,25 +73,25 @@
 @if (formaDePago == "Credito" || formaDePago == "Debito")
 {
     <div>
-        <label>Número de Tarjeta:</label>
+        <p><strong><label>Número de Tarjeta:</label></strong></p>
         <input type="text" @bind="numeroTarjeta" placeholder="____ ____ ____ ____" @oninput="FormatoNumeroTarj" />
         @if (mensajeTarjeta != "")
         {
-            <p class="text-danger">@mensajeTarjeta</p>
+            <p class="text-danger"><strong>@mensajeTarjeta</strong></p>
         }
     </div>
 
     <div>
-        <label>Nombre y apellido del titular:</label>
+        <p><strong><label>Nombre y apellido del titular:</label></strong></p>
         <input type="text" @bind="nombreApellido" />
         @if (mensajeTitular != "")
         {
-            <p class="text-danger">@mensajeTitular</p>
+            <p class="text-danger"><strong>@mensajeTitular</strong></p>
         }
     </div>
 
     <div>
-        <label>Fecha de Vencimiento (mm/aaaa):</label>
+        <p><strong><label>Fecha de Vencimiento (mm/aaaa):</label></strong></p>
         <select @bind="fechaVencimiento">
             @foreach (var fecha in fechasVencimientoPosteriores)
             {
@@ -97,11 +101,11 @@
     </div>
 
     <div>
-        <label>CVC:</label>
+        <p><strong><label>CVC:</label></strong></p>
         <input type="number" @bind="CVC" placeholder="___" @oninput="validarCVC" />
         @if (mensajeCVC != "")
         {
-            <p class="text-danger">@mensajeCVC</p>
+            <p class="text-danger"><strong>@mensajeCVC</strong></p>
         }
     </div>
 
@@ -109,18 +113,18 @@
 @if (formaDePago == "Efectivo")
 {
     <div>
-        <label>Monto con el que va a pagar:</label>
+        <p><strong><label>Monto con el que va a pagar:</label></strong></p>
         <input type="number" @bind="montoPagar" />
         @if (mensajeMonto != "")
         {
-            <p class="text-danger">@mensajeMonto</p>
+            <p class="text-danger"><strong>@mensajeMonto</strong></p>
         }
     </div>
 }
 
-<h3>Seleccionar Forma de Entrega</h3>
+<h3><strong>Seleccionar Forma de Entrega</strong></h3>
 <div>
-    <label>Forma de Entrega:</label>
+    <p><strong><label>Forma de Entrega:</label></strong></p>
     <select @bind="formaDeEntrega">
         <option value="antesPosible">Lo antes posible</option>
         <option value="fechaHoraEspecifica">Fecha y hora específica</option>
@@ -130,7 +134,7 @@
 @if (formaDeEntrega == "fechaHoraEspecifica")
 {
     <div>
-        <label>Fecha de entrega:</label>
+        <p><strong><label>Fecha de entrega:</label></strong></p>
         <select @bind="fechaEntrega" @oninput="CargarHorasPosteriores">
             @foreach (var fecha in fechasEntregaPosteriores)
             {
@@ -138,7 +142,7 @@
             }
         </select>
 
-        <label>Hora de entrega:</label>
+        <p><strong><label>Hora de entrega:</label></strong></p>
         <select @bind="horaEntrega">
             @foreach (var hora in horasPosteriores)
             {
@@ -149,13 +153,14 @@
 }
 
 
-<button class="btn btn-primary" @onclick="Continuar">Completar Compra</button>
-
+<button class="btn btn-success" @onclick="Continuar">
+    <i class="fas fa-check"></i> Completar Compra
+</button>
 
 
 
 @code {
-
+    // inicializacion de las variables que se van a utilizar
     private DateTime fechaVencimiento { get; set; }
     private List<DateTime> fechasVencimientoPosteriores { get; set; }
     private DateTime fechaEntrega { get; set; }
@@ -180,7 +185,23 @@
     private string mensajeCalle = "";
     private string mensajeAltura = "";
     private string mensajeTitular = "";
+    private List<Producto> productos = new List<Producto>
+    {
+        new Producto { Nombre = "Producto 1", Precio = 10.99m },
+        new Producto { Nombre = "Producto 2", Precio = 15.99m },
+        new Producto { Nombre = "Producto 3", Precio = 12.49m }
+    };
 
+    private int cantidadProductos = 0;
+    private decimal montoAcumulado = 0.0m;
+
+    private class Producto
+    {
+        public string Nombre { get; set; }
+        public decimal Precio { get; set; }
+    }
+
+    // funcion para cargar las fechas de vencimiento de la tarjeta de aca a 7 años
     private void CargarFechasPosterioresVencimiento()
     {
         // Obtiene el mes y año actual
@@ -205,6 +226,7 @@
         fechaVencimiento = new DateTime(anioActual, mesActual, 1);
     }
 
+    // funcion para cargar las fechas de entrega disponibles
     private void CargarFechasPosterioresEntrega()
     {
         // Obtiene la fecha actual
@@ -224,6 +246,7 @@
         fechaEntrega = fechaActual;
     }
 
+    // con esta funcion apenas se carga la pagina se ejecutan las tres funciones que se muestran aqui
     protected override void OnInitialized()
     {
         CargarHorasPosteriores();
@@ -231,6 +254,7 @@
         CargarFechasPosterioresVencimiento();
     }
 
+    // funcion para cargar las horas de entrega disponibles
     private void CargarHorasPosteriores()
     {
         // Obtiene la hora actual
@@ -260,6 +284,7 @@
         horaEntrega = horasPosteriores.FirstOrDefault();
     }
 
+    // funcion para validar el cvc
     private void validarCVC(ChangeEventArgs e)
     {
         if (e.Value.ToString().Length != 3)
@@ -273,7 +298,8 @@
             mensajeCVC = "";
         }
     }
-    // Función para dar formato al número de tarjeta (16 dígitos en 4 grupos de cuatro)
+
+    // funcion para validar el formato de la tarjeta
     private void FormatoNumeroTarj(ChangeEventArgs e)
     {
         numeroTarjeta = FormatoNumeroTarjeta(e.Value.ToString());
@@ -289,6 +315,7 @@
         }
     }
 
+    // Función para dar formato al número de tarjeta (16 dígitos en 4 grupos de cuatro)
     private string FormatoNumeroTarjeta(string numero)
     {
         // Eliminar caracteres no numéricos
@@ -314,57 +341,59 @@
 
     private void Continuar()
     {
-        if (!String.IsNullOrEmpty(Calle) && !String.IsNullOrEmpty(Altura))
+        if (!String.IsNullOrEmpty(Calle) && !String.IsNullOrEmpty(Altura)) // se valida que los campos calle y altura no esten vacios
         {
-            mensajeCalle = "";
-            mensajeAltura = "";
+            mensajeCalle = ""; // mensajes de error
+            mensajeAltura = ""; // mensajes de error
             if (formaDePago == "Efectivo")
             {
-                if (montoPagar >= montoAcumulado)
+                if (montoPagar >= montoAcumulado) // se valida que el monto con que se va a pagar sea mayor o igual que el monto del carrito
                 {
-                    mensajeMonto = "";
-                    if (cantidadProductos > 0)
+                    mensajeMonto = ""; // mensaje de error
+                    if (cantidadProductos > 0) // se valida que exista por lo menos un producto en el carrito
                     {
                         mensajeCarrito = "";
-                        NavigationManager.NavigateTo("/cargando");
+                        NavigationManager.NavigateTo("/cargando"); // si es todo correcto se muestra la pagina de carga
                     }
                     else
                     {
-                        mensajeCarrito = "Agregue productos al carrito";
+                        mensajeCarrito = "Agregue productos al carrito"; // mensaje de error que se muestra si no hay productos en el carrito
                     }
                 }
                 else
                 {
-                    mensajeMonto = "El monto con el que va a pagar no puede ser menor que el monto del carrito";
+                    mensajeMonto = "El monto con el que va a pagar no puede ser menor que el monto del carrito"; // mensaje de error si el monto no es correcto
                 }
             }
             else
             {
-                if (mensajeTarjeta == "" && mensajeCVC == "" && CVC != "" && numeroTarjeta != "" && nombreApellido != "")
+                // se valida que no exista mensaje de error con el nro de tarjeta ni con el cvc y además que estos campos no se encuentren vacios
+                // tambien se valida que el campo del nombre y apellido del titular no se encuentre vacio
+                if (mensajeTarjeta == "" && mensajeCVC == "" && CVC != "" && numeroTarjeta != "" && nombreApellido != "") 
                 {
                     if (cantidadProductos > 0)
                     {
                         mensajeCarrito = "";
-                        NavigationManager.NavigateTo("/cargando");
+                        NavigationManager.NavigateTo("/cargando"); // si pasan todas las validaciones nos lleva hasta la pagina de carga
                     }
                     else
                     {
-                        mensajeCarrito = "Agregue productos al carrito";
+                        mensajeCarrito = "Agregue productos al carrito"; // mensaje de error si no hay productos en el carrito
                     }
                 }
                 else
                 {
                     if (CVC == "")
                     {
-                        mensajeCVC = "Ingrese un código de seguridad";
+                        mensajeCVC = "Ingrese un código de seguridad"; // mensaje de error si no se ingreso cvc
                     }
                     if (numeroTarjeta == "")
                     {
-                        mensajeTarjeta = "Ingrese un nro de tarjeta";
+                        mensajeTarjeta = "Ingrese un nro de tarjeta"; // mensaje de error si no se ingreso nro tarjeta
                     }
                     if (nombreApellido == "")
                     {
-                        mensajeTitular = "Ingrese nombre y apellido del titular de la tarjeta";
+                        mensajeTitular = "Ingrese nombre y apellido del titular de la tarjeta"; // mensaje de error si no se ingreso el titular
                     }
                 }
 
@@ -374,33 +403,17 @@
         {
             if (Calle == "")
             {
-                mensajeCalle = "Ingrese una calle";
+                mensajeCalle = "Ingrese una calle"; // si no se ingreso la calle se muestra este mensaje de error
 
             }
             if (Altura == "")
             {
-                mensajeAltura = "Ingrese una altura";
+                mensajeAltura = "Ingrese una altura"; // si no se ingreso la altura se muestra este mensaje de error
             }
         }
     }
 
-    
-    private List<Producto> productos = new List<Producto>
-    {
-        new Producto { Nombre = "Producto 1", Precio = 10.99m },
-        new Producto { Nombre = "Producto 2", Precio = 15.99m },
-        new Producto { Nombre = "Producto 3", Precio = 12.49m }
-    };
-
-    private int cantidadProductos = 0;
-    private decimal montoAcumulado = 0.0m;
-
-    private class Producto
-    {
-        public string Nombre { get; set; }
-        public decimal Precio { get; set; }
-    }
-
+    // función donde se agregan los productos al carrito
     private void AgregarAlCarrito(Producto producto)
     {
         montoAcumulado += producto.Precio;
