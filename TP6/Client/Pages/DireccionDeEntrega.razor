@@ -145,6 +145,10 @@
                 <option value="@hora">@hora</option>
             }
         </select>
+        @if (mensajeHoraEntrega != "")
+        {
+            <p class="text-danger">@mensajeHoraEntrega</p>
+        }
     </div>
 }
 
@@ -180,6 +184,7 @@
     private string mensajeCalle = "";
     private string mensajeAltura = "";
     private string mensajeTitular = "";
+    private string mensajeHoraEntrega = "";
 
     private void CargarFechasPosterioresVencimiento()
     {
@@ -240,7 +245,7 @@
         horasPosteriores = new List<string>();
 
         // Agrega las horas posteriores a la hora actual a la lista
-        for (int i = horaActual.Hour; i <= 23; i++)
+        for (int i = horaActual.Hour + 1; i <= 23; i++)
         {
             horasPosteriores.Add(i.ToString("00") + ":00");
         }
@@ -356,6 +361,7 @@
                         mensajeTitular = "Ingrese nombre y apellido del titular de la tarjeta";
                     }
                 }
+               
             }
         }
         else
