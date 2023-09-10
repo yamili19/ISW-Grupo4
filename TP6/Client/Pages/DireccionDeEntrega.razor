@@ -131,7 +131,7 @@
 {
     <div>
         <label>Fecha de entrega:</label>
-        <select @bind="fechaEntrega">
+        <select @bind="fechaEntrega" @oninput="CargarHorasPosteriores">
             @foreach (var fecha in fechasEntregaPosteriores)
             {
                 <option value="@fecha">@fecha.ToShortDateString()</option>
@@ -145,10 +145,6 @@
                 <option value="@hora">@hora</option>
             }
         </select>
-        @if (mensajeHoraEntrega != "")
-        {
-            <p class="text-danger">@mensajeHoraEntrega</p>
-        }
     </div>
 }
 
@@ -184,7 +180,6 @@
     private string mensajeCalle = "";
     private string mensajeAltura = "";
     private string mensajeTitular = "";
-    private string mensajeHoraEntrega = "";
 
     private void CargarFechasPosterioresVencimiento()
     {
@@ -244,10 +239,21 @@
         // Inicializa la lista de horas
         horasPosteriores = new List<string>();
 
-        // Agrega las horas posteriores a la hora actual a la lista
-        for (int i = horaActual.Hour + 1; i <= 23; i++)
+        if (fechaEntrega != DateTime.Now.Date)
         {
-            horasPosteriores.Add(i.ToString("00") + ":00");
+            // Agrega las horas posteriores a la hora actual a la lista
+            for (int i = horaActual.Hour + 1; i <= 23; i++)
+            {
+                horasPosteriores.Add(i.ToString("00") + ":00");
+            }
+        }
+        else
+        {
+            // Agrega todas las horas del día desde la 1 hasta las 23 hs
+            for (int i = 1; i <= 23; i++)
+            {
+                horasPosteriores.Add(i.ToString("00") + ":00");
+            }
         }
 
         // Selecciona la hora actual como valor predeterminado
@@ -308,7 +314,7 @@
 
     private void Continuar()
     {
-        if (!String.IsNullOrEmpty(Calle) || !String.IsNullOrEmpty(Altura))
+        if (!String.IsNullOrEmpty(Calle) && !String.IsNullOrEmpty(Altura))
         {
             mensajeCalle = "";
             mensajeAltura = "";
@@ -361,13 +367,20 @@
                         mensajeTitular = "Ingrese nombre y apellido del titular de la tarjeta";
                     }
                 }
-               
+
             }
         }
         else
         {
-            mensajeCalle = "Ingrese una calle";
-            mensajeAltura = "Ingrese una altura";
+            if (Calle == "")
+            {
+                mensajeCalle = "Ingrese una calle";
+
+            }
+            if (Altura == "")
+            {
+                mensajeAltura = "Ingrese una altura";
+            }
         }
     }
 
