@@ -223,7 +223,7 @@
         }
 
         // Selecciona el mes y año actual como valor predeterminado
-        fechaVencimiento = new DateTime(anioActual, mesActual, 1);
+        fechaVencimiento = fechasVencimientoPosteriores.FirstOrDefault();
     }
 
     // funcion para cargar las fechas de entrega disponibles
@@ -306,7 +306,7 @@
         if (numeroTarjeta.Length > 19 || numeroTarjeta.Length < 19)
         {
             numeroTarjeta = "";
-            mensajeTarjeta = "Tarjeta inválida. Ingrese una tarjeta válida";
+            mensajeTarjeta = "Tarjeta inválida. Ingrese un nro de tarjeta válido";
         }
         else
         {
@@ -371,14 +371,24 @@
                 // tambien se valida que el campo del nombre y apellido del titular no se encuentre vacio
                 if (mensajeTarjeta == "" && mensajeCVC == "" && CVC != "" && numeroTarjeta != "" && nombreApellido != "") 
                 {
-                    if (cantidadProductos > 0)
+                    mensajeTarjeta = "";
+                    mensajeCVC = "";
+                    if (cantidadProductos > 0 && numeroTarjeta[0].ToString() == 5.ToString() ) 
                     {
                         mensajeCarrito = "";
                         NavigationManager.NavigateTo("/cargando"); // si pasan todas las validaciones nos lleva hasta la pagina de carga
                     }
                     else
                     {
-                        mensajeCarrito = "Agregue productos al carrito"; // mensaje de error si no hay productos en el carrito
+                        if (numeroTarjeta[0].ToString() != 5.ToString())
+                        {
+                            mensajeTarjeta = "Ingrese una tarjeta Mastercard válida"; // mensaje de error si la tarjeta que se ingreo NO es Mastercad
+                        }
+                        if (cantidadProductos <= 0)
+                        {
+                            mensajeCarrito = "Agregue productos al carrito"; // mensaje de error si no hay productos en el carrito
+
+                        }
                     }
                 }
                 else
