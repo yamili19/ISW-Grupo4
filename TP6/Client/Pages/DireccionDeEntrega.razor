@@ -1,8 +1,23 @@
 ﻿@page "/direccion-entrega"
 @inject NavigationManager NavigationManager
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Estilos CSS para toda la página */
+        body {
+            background-color: lightgray; /* Cambia el color de fondo de toda la página */
+            font-family: Arial, sans-serif; /* Cambia la fuente de todo el texto en la página */
+        }
+
+        h3 {
+            color: blue; /* Cambia el color de todos los encabezados h3 */
+        }
+    </style>
+</head>
+<!-- Resto de tu contenido HTML y Razor... -->
+
 <h3><strong>Ingrese su Dirección de Entrega</strong></h3>
 
 <div>
@@ -43,8 +58,8 @@
 <ul>
     @foreach (var producto in productos)
     {
-        <li>
-            <p><strong>@producto.Nombre - Precio: $@producto.Precio</strong>.</p>
+        <li style="display: flex; align-items: center; gap: 10px;">
+            <p><strong>@producto.Nombre - Precio: $@producto.Precio</strong></p>
             <button class="btn btn-outline-primary" @onclick="() => AgregarAlCarrito(producto)">
                 <i class="fas fa-cart-plus"></i> Agregar al Carrito
             </button>
@@ -153,7 +168,7 @@
 }
 
 
-<button class="btn btn-success" @onclick="Continuar">
+<button class="btn btn-outline-primary" @onclick="Continuar">
     <i class="fas fa-check"></i> Completar Compra
 </button>
 
