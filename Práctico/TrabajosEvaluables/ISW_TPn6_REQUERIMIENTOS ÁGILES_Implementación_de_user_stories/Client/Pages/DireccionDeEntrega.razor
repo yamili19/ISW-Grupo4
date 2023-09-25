@@ -1,0 +1,448 @@
+﻿@page "/direccion-entrega"
+@inject NavigationManager NavigationManager
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        /* Estilos CSS para toda la página */
+        body {
+            background-color: lightgray; /* Cambia el color de fondo de toda la página */
+            font-family: Arial, sans-serif; /* Cambia la fuente de todo el texto en la página */
+        }
+
+        h3 {
+            color: blue; /* Cambia el color de todos los encabezados h3 */
+        }
+    </style>
+</head>
+<!-- Resto de tu contenido HTML y Razor... -->
+
+<h3><strong>Ingrese su Dirección de Entrega</strong></h3>
+
+<div>
+    <p><strong><label for="calle">Calle:</label></strong></p>
+    <input type="text" class="form-control" id="calle" @bind="Calle" />
+    @if (mensajeCalle != "")
+    {
+        <p class="text-danger"><strong>@mensajeCalle</strong></p>
+    }
+</div>
+
+<div>
+    <p><strong><label for="altura">Altura:</label></strong></p>
+    <input type="number" class="form-control" id="altura" @bind="Altura" />
+    @if (mensajeAltura != "")
+    {
+        <p class="text-danger"><strong>@mensajeAltura</strong></p>
+    }
+</div>
+
+<div>
+    <p><strong><label for="ciudad">Ciudad:</label></strong></p>
+    <select class="form-control" id="ciudad" @bind="Ciudad">
+        <option value="Alta Gracia">Alta Gracia</option>
+        <option value="Córdoba">Córdoba</option>
+        <option value="Cruz del Eje">Cruz del Eje</option>
+        <option value="Rio Cuarto">Rio Cuarto</option>
+    </select>
+</div>
+
+<div>
+    <p><strong><label for="referencia">Referencia (opcional):</label></strong></p>
+    <input type="text" class="form-control" id="referencia" @bind="Referencia" />
+</div>
+
+<!-- Sección de Productos y Monto Acumulado -->
+<h3> <strong>Selección de Productos</strong></h3>
+<ul>
+    @foreach (var producto in productos)
+    {
+        <li style="display: flex; align-items: center; gap: 10px;">
+            <p><strong>@producto.Nombre - Precio: $@producto.Precio</strong></p>
+            <button class="btn btn-outline-primary" @onclick="() => AgregarAlCarrito(producto)">
+                <i class="fas fa-cart-plus"></i> Agregar al Carrito
+            </button>
+        </li>
+    }
+    @if (mensajeCarrito != "")
+    {
+        <p class="text-danger"><strong>@mensajeCarrito</strong></p>
+    }
+</ul>
+
+<p><strong>Cantidad de Productos en el Carrito: @cantidadProductos</strong></p>
+<p><strong>Monto Acumulado: $@montoAcumulado</strong></p>
+
+<h3><strong>Seleccionar Forma de Pago</strong></h3>
+
+<div>
+    <p><strong><label>Forma de Pago:</label></strong></p>
+    <select @bind="formaDePago">
+        <option value="Efectivo">Efectivo</option>
+        <option value="Debito">Tarjeta de Débito</option>
+        <option value="Credito">Tarjeta de Crédito</option>
+    </select>
+</div>
+
+@if (formaDePago == "Credito" || formaDePago == "Debito")
+{
+    <div>
+        <p><strong><label>Número de Tarjeta:</label></strong></p>
+        <input type="text" @bind="numeroTarjeta" placeholder="____ ____ ____ ____" @oninput="FormatoNumeroTarj" />
+        @if (mensajeTarjeta != "")
+        {
+            <p class="text-danger"><strong>@mensajeTarjeta</strong></p>
+        }
+    </div>
+
+    <div>
+        <p><strong><label>Nombre y apellido del titular:</label></strong></p>
+        <input type="text" @bind="nombreApellido" />
+        @if (mensajeTitular != "")
+        {
+            <p class="text-danger"><strong>@mensajeTitular</strong></p>
+        }
+    </div>
+
+    <div>
+        <p><strong><label>Fecha de Vencimiento (mm/aaaa):</label></strong></p>
+        <select @bind="fechaVencimiento">
+            @foreach (var fecha in fechasVencimientoPosteriores)
+            {
+                <option value="@fecha">@fecha.ToString("MM/yyyy")</option>
+            }
+        </select>
+    </div>
+
+    <div>
+        <p><strong><label>CVC:</label></strong></p>
+        <input type="number" @bind="CVC" placeholder="___" @oninput="validarCVC" />
+        @if (mensajeCVC != "")
+        {
+            <p class="text-danger"><strong>@mensajeCVC</strong></p>
+        }
+    </div>
+
+}
+@if (formaDePago == "Efectivo")
+{
+    <div>
+        <p><strong><label>Monto con el que va a pagar:</label></strong></p>
+        <input type="number" @bind="montoPagar" />
+        @if (mensajeMonto != "")
+        {
+            <p class="text-danger"><strong>@mensajeMonto</strong></p>
+        }
+    </div>
+}
+
+<h3><strong>Seleccionar Forma de Entrega</strong></h3>
+<div>
+    <p><strong><label>Forma de Entrega:</label></strong></p>
+    <select @bind="formaDeEntrega">
+        <option value="antesPosible">Lo antes posible</option>
+        <option value="fechaHoraEspecifica">Fecha y hora específica</option>
+    </select>
+</div>
+
+@if (formaDeEntrega == "fechaHoraEspecifica")
+{
+    <div>
+        <p><strong><label>Fecha de entrega:</label></strong></p>
+        <select @bind="fechaEntrega" @oninput="CargarHorasPosteriores">
+            @foreach (var fecha in fechasEntregaPosteriores)
+            {
+                <option value="@fecha">@fecha.ToShortDateString()</option>
+            }
+        </select>
+
+        <p><strong><label>Hora de entrega:</label></strong></p>
+        <select @bind="horaEntrega">
+            @foreach (var hora in horasPosteriores)
+            {
+                <option value="@hora">@hora</option>
+            }
+        </select>
+    </div>
+}
+
+
+<button class="btn btn-outline-primary" @onclick="Continuar">
+    <i class="fas fa-check"></i> Completar Compra
+</button>
+
+
+
+@code {
+    // inicializacion de las variables que se van a utilizar
+    private DateTime fechaVencimiento { get; set; }
+    private List<DateTime> fechasVencimientoPosteriores { get; set; }
+    private DateTime fechaEntrega { get; set; }
+    private List<DateTime> fechasEntregaPosteriores { get; set; }
+    private string mensajeCVC = "";
+    private string formaDePago = "Efectivo";
+    private string numeroTarjeta = "";
+    private string nombreApellido = "";
+    private string CVC = "";
+    private int montoPagar = 0;
+    private string formaDeEntrega = "antesPosible";
+    private bool camposLlenosDireccion = false;
+    private string Calle = "";
+    private string Altura = "";
+    private string Ciudad = "Alta Gracia";
+    private string Referencia = "";
+    private string horaEntrega { get; set; }
+    private List<string> horasPosteriores { get; set; }
+    private string mensajeTarjeta = "";
+    private string mensajeCarrito = "";
+    private string mensajeMonto = "";
+    private string mensajeCalle = "";
+    private string mensajeAltura = "";
+    private string mensajeTitular = "";
+    private List<Producto> productos = new List<Producto>
+    {
+        new Producto { Nombre = "Producto 1", Precio = 10.99m },
+        new Producto { Nombre = "Producto 2", Precio = 15.99m },
+        new Producto { Nombre = "Producto 3", Precio = 12.49m }
+    };
+
+    private int cantidadProductos = 0;
+    private decimal montoAcumulado = 0.0m;
+
+    private class Producto
+    {
+        public string Nombre { get; set; }
+        public decimal Precio { get; set; }
+    }
+
+    // funcion para cargar las fechas de vencimiento de la tarjeta de aca a 7 años
+    private void CargarFechasPosterioresVencimiento()
+    {
+        // Obtiene el mes y año actual
+        DateTime fechaActual = DateTime.Now.Date; // Solo la fecha, sin la hora
+        int mesActual = fechaActual.Month;
+        int anioActual = fechaActual.Year;
+
+        // Inicializa la lista de fechas
+        fechasVencimientoPosteriores = new List<DateTime>();
+        // Agrega las fechas iguales o posteriores al mes y año actual a la lista
+        for (int anio = anioActual; anio <= anioActual + 7; anio++) // Puedes ajustar el rango de años según tus necesidades
+        {
+            for (int mes = mesActual; mes <= 12; mes++) // 12 meses en un año
+            {
+                DateTime fecha = new DateTime(anio, mes, 1);
+                fechasVencimientoPosteriores.Add(fecha);
+            }
+            mesActual = 1; // Reiniciar el mes después del primer año
+        }
+
+        // Selecciona el mes y año actual como valor predeterminado
+        fechaVencimiento = fechasVencimientoPosteriores.FirstOrDefault();
+    }
+
+    // funcion para cargar las fechas de entrega disponibles
+    private void CargarFechasPosterioresEntrega()
+    {
+        // Obtiene la fecha actual
+        DateTime fechaActual = DateTime.Now.Date; // Solo la fecha, sin la hora
+
+        // Inicializa la lista de fechas
+        fechasEntregaPosteriores = new List<DateTime>();
+
+        // Agrega las fechas iguales o posteriores a la fecha actual a la lista
+        for (int i = 0; i <= 7; i++) // Por ejemplo, puedes cargar las próximas 7 fechas
+        {
+            DateTime fecha = fechaActual.AddDays(i);
+            fechasEntregaPosteriores.Add(fecha);
+        }
+
+        // Selecciona la fecha actual como valor predeterminado
+        fechaEntrega = fechaActual;
+    }
+
+    // con esta funcion apenas se carga la pagina se ejecutan las tres funciones que se muestran aqui
+    protected override void OnInitialized()
+    {
+        CargarHorasPosteriores();
+        CargarFechasPosterioresEntrega();
+        CargarFechasPosterioresVencimiento();
+    }
+
+    // funcion para cargar las horas de entrega disponibles
+    private void CargarHorasPosteriores()
+    {
+        // Obtiene la hora actual
+        DateTime horaActual = DateTime.Now;
+
+        // Inicializa la lista de horas
+        horasPosteriores = new List<string>();
+
+        if (fechaEntrega != DateTime.Now.Date)
+        {
+            // Agrega las horas posteriores a la hora actual a la lista
+            for (int i = horaActual.Hour + 1; i <= 23; i++)
+            {
+                horasPosteriores.Add(i.ToString("00") + ":00");
+            }
+        }
+        else
+        {
+            // Agrega todas las horas del día desde la 1 hasta las 23 hs
+            for (int i = 1; i <= 23; i++)
+            {
+                horasPosteriores.Add(i.ToString("00") + ":00");
+            }
+        }
+
+        // Selecciona la hora actual como valor predeterminado
+        horaEntrega = horasPosteriores.FirstOrDefault();
+    }
+
+    // funcion para validar el cvc
+    private void validarCVC(ChangeEventArgs e)
+    {
+        if (e.Value.ToString().Length != 3)
+        {
+            CVC = "";
+            mensajeCVC = "Ingrese un CVC válido";
+        }
+        else
+        {
+            CVC = e.Value.ToString();
+            mensajeCVC = "";
+        }
+    }
+
+    // funcion para validar el formato de la tarjeta
+    private void FormatoNumeroTarj(ChangeEventArgs e)
+    {
+        numeroTarjeta = FormatoNumeroTarjeta(e.Value.ToString());
+        if (numeroTarjeta.Length > 19 || numeroTarjeta.Length < 19)
+        {
+            numeroTarjeta = "";
+            mensajeTarjeta = "Tarjeta inválida. Ingrese un nro de tarjeta válido";
+        }
+        else
+        {
+            numeroTarjeta = FormatoNumeroTarjeta(e.Value.ToString());
+            mensajeTarjeta = "";
+        }
+    }
+
+    // Función para dar formato al número de tarjeta (16 dígitos en 4 grupos de cuatro)
+    private string FormatoNumeroTarjeta(string numero)
+    {
+        // Eliminar caracteres no numéricos
+        numero = new string(numero.Where(char.IsDigit).ToArray());
+
+        // Aplicar formato de 16 dígitos en 4 grupos de cuatro
+        if (numero.Length >= 4)
+        {
+            numero = numero.Insert(4, " ");
+        }
+        if (numero.Length >= 9)
+        {
+            numero = numero.Insert(9, " ");
+        }
+        if (numero.Length >= 14)
+        {
+            numero = numero.Insert(14, " ");
+        }
+
+        numeroTarjeta = numero; // Actualiza la propiedad vinculada
+        return numero;
+    }
+
+    private void Continuar()
+    {
+        if (!String.IsNullOrEmpty(Calle) && !String.IsNullOrEmpty(Altura)) // se valida que los campos calle y altura no esten vacios
+        {
+            mensajeCalle = ""; // mensajes de error
+            mensajeAltura = ""; // mensajes de error
+            if (formaDePago == "Efectivo")
+            {
+                if (montoPagar >= montoAcumulado) // se valida que el monto con que se va a pagar sea mayor o igual que el monto del carrito
+                {
+                    mensajeMonto = ""; // mensaje de error
+                    if (cantidadProductos > 0) // se valida que exista por lo menos un producto en el carrito
+                    {
+                        mensajeCarrito = "";
+                        NavigationManager.NavigateTo("/cargando"); // si es todo correcto se muestra la pagina de carga
+                    }
+                    else
+                    {
+                        mensajeCarrito = "Agregue productos al carrito"; // mensaje de error que se muestra si no hay productos en el carrito
+                    }
+                }
+                else
+                {
+                    mensajeMonto = "El monto con el que va a pagar no puede ser menor que el monto del carrito"; // mensaje de error si el monto no es correcto
+                }
+            }
+            else
+            {
+                // se valida que no exista mensaje de error con el nro de tarjeta ni con el cvc y además que estos campos no se encuentren vacios
+                // tambien se valida que el campo del nombre y apellido del titular no se encuentre vacio
+                if (mensajeTarjeta == "" && mensajeCVC == "" && CVC != "" && numeroTarjeta != "" && nombreApellido != "") 
+                {
+                    mensajeTarjeta = "";
+                    mensajeCVC = "";
+                    if (cantidadProductos > 0 && numeroTarjeta[0].ToString() == 5.ToString() ) 
+                    {
+                        mensajeCarrito = "";
+                        NavigationManager.NavigateTo("/cargando"); // si pasan todas las validaciones nos lleva hasta la pagina de carga
+                    }
+                    else
+                    {
+                        if (numeroTarjeta[0].ToString() != 5.ToString())
+                        {
+                            mensajeTarjeta = "Ingrese una tarjeta Mastercard válida"; // mensaje de error si la tarjeta que se ingreo NO es Mastercad
+                        }
+                        if (cantidadProductos <= 0)
+                        {
+                            mensajeCarrito = "Agregue productos al carrito"; // mensaje de error si no hay productos en el carrito
+
+                        }
+                    }
+                }
+                else
+                {
+                    if (CVC == "")
+                    {
+                        mensajeCVC = "Ingrese un código de seguridad"; // mensaje de error si no se ingreso cvc
+                    }
+                    if (numeroTarjeta == "")
+                    {
+                        mensajeTarjeta = "Ingrese un nro de tarjeta"; // mensaje de error si no se ingreso nro tarjeta
+                    }
+                    if (nombreApellido == "")
+                    {
+                        mensajeTitular = "Ingrese nombre y apellido del titular de la tarjeta"; // mensaje de error si no se ingreso el titular
+                    }
+                }
+
+            }
+        }
+        else
+        {
+            if (Calle == "")
+            {
+                mensajeCalle = "Ingrese una calle"; // si no se ingreso la calle se muestra este mensaje de error
+
+            }
+            if (Altura == "")
+            {
+                mensajeAltura = "Ingrese una altura"; // si no se ingreso la altura se muestra este mensaje de error
+            }
+        }
+    }
+
+    // función donde se agregan los productos al carrito
+    private void AgregarAlCarrito(Producto producto)
+    {
+        montoAcumulado += producto.Precio;
+        cantidadProductos++; // Incrementar la cantidad de productos en el carrito.
+    }
+
+}

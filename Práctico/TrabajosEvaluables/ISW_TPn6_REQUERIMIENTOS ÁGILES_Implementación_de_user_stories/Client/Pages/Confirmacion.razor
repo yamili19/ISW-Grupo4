@@ -1,0 +1,37 @@
+﻿@page "/confirmacion"
+@inject NavigationManager NavigationManager
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        .centered-gif {
+            display: block;  /* Hacer que la imagen sea un bloque para poder centrarla */
+            margin: 0 auto;   /* Margen automático en los lados izquierdo y derecho para centrarla horizontalmente */
+        }
+
+        body {
+            background-color: lightgray; /* Cambia el color de fondo de toda la página */
+            font-family: Arial, sans-serif; /* Cambia la fuente de todo el texto en la página */
+        }
+
+        h3 {
+            color: blue; /* Cambia el color de todos los encabezados h3 */
+        }
+    </style>
+</head>
+
+<h3><strong>¡Gracias por su compra!</strong></h3>
+
+<img src="loading.gif" alt="Imagen de exito" class="centered-gif">
+
+<button class="btn btn-outline-primary" @onclick="Volver">
+    <i class="fas fa-arrow-left"></i> Volver
+</button>
+
+@code {
+    private void Volver()
+    {
+        NavigationManager.NavigateTo("/direccion-entrega");
+    }
+}

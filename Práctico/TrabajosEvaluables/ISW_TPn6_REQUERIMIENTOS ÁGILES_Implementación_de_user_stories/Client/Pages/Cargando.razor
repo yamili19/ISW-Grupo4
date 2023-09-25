@@ -1,0 +1,40 @@
+﻿@page "/cargando"
+@inject NavigationManager NavigationManager
+
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .centered-gif {
+            display: block; /* Hacer que la imagen sea un bloque para poder centrarla */
+            margin: 0 auto; /* Margen automático en los lados izquierdo y derecho para centrarla horizontalmente */
+        }
+
+        body {
+            background-color: lightgray; /* Cambia el color de fondo de toda la página */
+            font-family: Arial, sans-serif; /* Cambia la fuente de todo el texto en la página */
+        }
+
+        h3 {
+            color: blue; /* Cambia el color de todos los encabezados h3 */
+        }
+    </style>
+</head>
+
+<h3><strong>Espere, estamos procesando su pedido</strong></h3>
+
+<img src="loading(1).gif" alt="Imagen de carga">
+
+@code {
+    private async Task RedireccionarDespuesDeUnTiempo()
+    {
+        await Task.Delay(5000); // Espera 5 segundos antes de ir a la pagina de confirmación
+        NavigationManager.NavigateTo("/confirmacion");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await RedireccionarDespuesDeUnTiempo();
+    }
+}
+
