@@ -7,7 +7,6 @@ Integrantes:
 + Sonzini Astudillo, Enrique José - 82508 - enriquesonzini@gmail.com
 + Muñoz Jonathan 77915 - jonathan20cba@gmail.com 
 
-+ Albarracin, Gonzalo Nahuel - 68719 - galbarracin16@gmail.com
 
 En el siguiente repositorio se encontraran tópicos acerca de la materia Ingeniería de Software de la carrera de Ingenierí­a en Sistemas dictada por la Universidad Tecnológica Nacional Facultad Regional Córdoba.
 
